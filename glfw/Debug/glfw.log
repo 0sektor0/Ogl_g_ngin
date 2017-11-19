@@ -1,0 +1,8 @@
+﻿  Main.cpp
+Main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp__glBegin@4 в функции "void __cdecl Render_frame(void)" (?Render_frame@@YAXXZ)
+Main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp__glClear@4 в функции "void __cdecl Render_frame(void)" (?Render_frame@@YAXXZ)
+Main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp__glClearColor@16 в функции "void __cdecl Render_frame(void)" (?Render_frame@@YAXXZ)
+Main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp__glEnd@0 в функции "void __cdecl Render_frame(void)" (?Render_frame@@YAXXZ)
+Main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp__glVertex3f@12 в функции "void __cdecl Render_frame(void)" (?Render_frame@@YAXXZ)
+Main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp__glViewport@16 в функции _main
+c:\users\egrig\documents\visual studio 2015\Projects\glfw\Debug\glfw.exe : fatal error LNK1120: неразрешенных внешних элементов: 6
