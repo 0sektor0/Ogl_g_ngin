@@ -1,57 +1,52 @@
 #include "Main.h"
-#include "Mesh.h"
-
+#include "Scene.h"
 
 
 
 void Key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void Cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 bool Init_window(GLFWwindow** window, int w, int h, bool is_resizeble);
-void Draw_frame(Shader& shader, vector<Mesh*>& objects);
 bool Init_GLEW(GLFWwindow* window);
-void Load_objets(Shader* shader);
+void CalculateFrameRate();
 
+int window_width = 800;
+int window_height = 600;
+float FPS;
 
-
-
-int screen_width = 800;
-int screen_height = 600;
-int selected_object_index = 0; 
-vector <Mesh*> objects;
-Mesh* selected_object;
-
+Scene* scene;
 
 
 
 //главная функция
 int main()
 {
+	int frames_count = 0;
 	GLFWwindow* window;
-	Shader* shader;
 
-	if (!Init_window(&window, screen_width, screen_height, 1))
+	if (!Init_window(&window, window_width, window_height, 1))
 		return -1;
 
 	if (!Init_GLEW(window))
 		return -1;
 
 	//загружаем объекты
-	shader = new Shader("shader");
-	Load_objets(shader);
+	scene = new Scene(window_width, window_height);
 
 	//привязываем к окну обработчик нажатия клавиш
 	glfwSetKeyCallback(window, Key_callback);
+	//glfwSetCursorPosCallback(window, Cursor_position_callback);
 
 	//игровой цикл
 	while (!glfwWindowShouldClose(window))
 	{
-		Draw_frame(*shader, objects);
+		scene->Render();
 		glfwSwapBuffers(window);
+		//CalculateFrameRate();
 
 		glfwPollEvents();
 	}
 
 	//завершение работы
-	glfwTerminate();
 	return 0;
 }
 
@@ -98,6 +93,7 @@ bool Init_GLEW(GLFWwindow* window)
 		return 0;
 	}
 
+	//максимальное число передаваемых параметров
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	std::cout << "\r\n\r\nGLEW succesfully initialized\r\nMaximum nr of vertex attributes supported: " << nrAttributes;
 
@@ -114,136 +110,47 @@ bool Init_GLEW(GLFWwindow* window)
 //отклик на нажатие клавиш
 void Key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	int buf;
+	scene->Key_callback(window, key, scancode, action, mode);
+}
 
-	switch (key)
-	{
-	case GLFW_KEY_ESCAPE:
-		if (action == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, GL_TRUE);
-		break;
 
-	case GLFW_KEY_W:
-		selected_object->model = glm::translate(selected_object->model, vec3(0.0f, 0.0f, -0.1f));
-		break;
-
-	case GLFW_KEY_S:
-		selected_object->model = glm::translate(selected_object->model, vec3(0.0f, 0.0f, +0.1f));
-		break;
-
-	case GLFW_KEY_A:
-		selected_object->model = glm::translate(selected_object->model, vec3(-0.1f, 0.0f, 0));
-		break;
-
-	case GLFW_KEY_D:
-		selected_object->model = glm::translate(selected_object->model, vec3(+0.1f, 0.0f, 0.0f));
-		break;
-
-	case GLFW_KEY_E:
-		selected_object->local = glm::rotate(selected_object->local, -0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
-		break;
-		
-	case GLFW_KEY_1:
-		if (objects.size() > 0 && action == GLFW_PRESS)
-		{
-			if (--selected_object_index < 0)
-				selected_object_index = 0;
-
-			selected_object = objects[selected_object_index];
-			cout << "\r\nobject " << selected_object_index << " selected";
-		}
-		else
-			cout << "there is no objects to select\r\n";
-		break;
-
-	case GLFW_KEY_2:
-		buf = objects.size();
-		if (buf > 0 &&  action == GLFW_PRESS)
-		{
-			if (++selected_object_index >= buf)
-				selected_object_index = 0;
-			
-			selected_object = objects[selected_object_index];
-			cout << "\r\nobject " << selected_object_index << " selected";
-		}
-		else
-			cout << "\r\nthere is no objects to select\r\n";
-		break;
-
-	default:
-		break;
-	}
+void Cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	scene->Cursor_position_callback(window, xpos, ypos);
 }
 
 
 
 
-//функция отрисовки
-void Draw_frame(Shader& shader, vector <Mesh*>& objects)
+//расчет фпс
+void CalculateFrameRate()
 {
-	//cout << "\r\n" << (GLfloat)glfwGetTime();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //установка состояния очистки
-	glClear(GL_COLOR_BUFFER_BIT); //очистка
-		
-	shader.Bind();
+	//Ниже мы создадим несколько статичных переменных, т.к. хотим, чтобы они сохраняли своё
+	//значение после завершения работы ф-ии. Мы могли бы сделать их глобальными, но это будет
+	//излишним.
 
-	glm::mat4 view;
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	static float framesPerSecond = 0.0f;    //наши фпс
+	static float lastTime = 0.0f;           //Тут хранится время, прошедшее с последнего кадра
 
-	glm::mat4 projection;
-	projection = glm::perspective(45.0f, (float)(screen_width / screen_height), 0.1f, 100.0f);
-	// 1/2: левая/правая координата усеченной прирамиды; 3/4 нижняя и верхняя границы пирамиды 
-	//projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -0.1f, 1.0f);
+											//Тут мы получаем текущий tick count и умножаем его на 0.001 для конвертации из миллисекунд в секунды.
+	float currentTime = clock() * 0.001f;
 
-	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Draw(screen_width, screen_height, view, projection);
-}
+	//Увеличиваем счетчик кадров
+	framesPerSecond++;
 
-
-
-
-void Load_objets(Shader* shader)
-{
-	vector <Texture*> textures;
-	GLfloat vertices1[] = {
-		// Позиции            // Цвета            // Текстурные координаты
-		0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // Верхний правый
-		0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // Нижний правый
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // Нижний левый
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // Верхний левый
-	};
-	GLfloat vertices2[] = {
-		// Позиции            // Цвета            // Текстурные координаты
-		0.5f,  1.0f, 0.0f,    1.0f, 0.0f, 0.0f,   0.75f, 1.0f,   // Верхний правый
-		1.0f,  0.0f, 0.0f,    1.0f, 1.0f, 0.0f,   1.0f, 0.5f,    // средний правый
-		0.5f, -1.0f, 0.0f,    0.0f, 1.0f, 0.0f,   0.75f, 0.0f,   // Нижний правый
-		-0.5f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.25f, 0.0f,   // Нижний левый
-		-1.0f, 0.0f, 0.0f,    0.0f, 0.0f, 1.0f,   0.0f, 0.5f,    // средний левый
-		-0.5f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.25f, 1.0f    // Верхний левый
-	};
-	GLuint indices1[] = {
-		2, 3, 0,
-		0, 1, 2
-	};
-	GLuint indices2[] = {
-		0, 1, 2,
-		0, 2, 3,
-		0, 3, 5,
-		3, 4, 5,
-	};
-
-	objects.insert(objects.end(), new Mesh(&vertices1[0], 32, &indices1[0], 6));
-	objects.insert(objects.end(), new Mesh(&vertices2[0], 48, &indices2[0], 12));
-
-	 textures.insert(textures.end(), new Texture("D:\\Textures\\container.jpg", GL_TEXTURE_2D, 0, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE));
-	 textures.insert(textures.end(), new Texture("D:\\Textures\\default.jpg", GL_TEXTURE_2D, 0, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE));
-
-	for (int i = 0; i < objects.size(); i++)
+	//Теперь вычтем из текущего времени последнее запомненное время. Если результат больше единицы,
+	//это значит, что секунда прошла и нужно вывести новый FPS.
+	if (currentTime - lastTime > 1.0f)
 	{
-		objects[i]->Bind_shader(shader);
-		objects[i]->Bind_texture(textures[i]);
-	}
+		//Устанавливаем lastTime в текущее время. Теперь оно будет использоватся как предидущее время
+		//для след. секунды.
+		lastTime = currentTime;
 
-	selected_object = objects[0];
+		// Установим FPS для вывода:
+		FPS = framesPerSecond;
+		cout << "\r\n" << FPS;
+
+		//Сбросим FPS
+		framesPerSecond = 0;
+	}
 }
