@@ -1,6 +1,6 @@
 #include "Main.h"
-#include "Object.h"
 #include "Camera.h"
+#include "TextField.h"
 
 
 
@@ -23,6 +23,7 @@ private:
 
 	int selected_object_index;
 	vector <Object*> objects;
+	TextField* tfield;
 	Camera* camera;
 	bool keys[1024];
 };

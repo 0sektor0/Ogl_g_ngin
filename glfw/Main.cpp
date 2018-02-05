@@ -36,8 +36,8 @@ int main()
 	glfwSetKeyCallback(window, Key_callback);
 
 	//захват курсора
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, Cursor_position_callback);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetCursorPosCallback(window, Cursor_position_callback);
 
 	//игровой цикл
 	while (!glfwWindowShouldClose(window))

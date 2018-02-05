@@ -2,12 +2,14 @@
 
 #define CAM_DEFAULT_ORTHO_RIGHT 800.0f
 #define CAM_DEFAULT_SENSITIVITY 0.05f
-#define CAM_DEFAULT_SIDE_RATIO 1.5f;
+#define CAM_DEFAULT_SIDE_RATIO 1.5f
 #define CAM_DEFAULT_ORTHO_LEFT 0.0f
 #define CAM_DEFAULT_ORTHO_DOWN 0.0f
 #define CAM_DEFAULT_ORTHO_UP 600.0f
 #define CAM_DEFAULT_NEAR_PLANE 0.1f
 #define CAM_DEFAULT_FAR_PLANE 100.f
+#define CAM_PROJECTION_PERSPECTIVE 0
+#define CAM_PROJECTION_ORTHO 1
 #define CAM_DEFAULT_SPEED 0.1f
 #define CAM_DEFAULT_FOV 45.0f
 
@@ -18,7 +20,8 @@ class Camera
 public:
 	void SetOrthoProjection(float left, float right, float down, float up, float near_plane, float far_plane);
 	void SetPerspectiveProjection(float fov, float side_ratio, float near_plane, float far_plane);
-	Camera(const int& window_width, const int& window_height);	
+	Camera(int projection_type);
+	Camera();	
 	//cam movement
 	void Rotate(const double& xpos, const double& ypos);
 	void LookAtPoint(glm::vec3& target);

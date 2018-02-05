@@ -4,7 +4,7 @@
 
 Scene::Scene(const int& window_width, const int& window_height)
 {
-	camera = new Camera(window_width, window_height);
+	camera = new Camera(CAM_PROJECTION_ORTHO);
 	LoadObjects();
 }
 
@@ -27,7 +27,7 @@ void Scene::Render()
 	
 	glClearColor(0.2f, 0.3f, 0.3f, 0.0f); //установка состояния очистки
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render(camera->view, camera->projection);
 
@@ -42,10 +42,10 @@ void Scene::LoadObjects()
 
 	GLfloat vertices[] = {
 		// Позиции            // Цвета                  // Текстурные координаты
-		0.5f,  0.5f, 0.1f,    1.0f, 1.0f, 1.0f, 0.5f,   1.0f, 1.0f,   // Верхний правый
-		0.5f, -0.5f, 0.1f,    1.0f, 1.0f, 1.0f, 0.5f,   1.0f, 0.0f,   // Нижний правыйglfw.rc
-		-0.5f, -0.5f, 0.1f,   1.0f, 1.0f, 1.0f, 0.5f,   0.0f, 0.0f,   // Нижний левыйglfw
-		-0.5f,  0.5f, 0.1f,   1.0f, 1.0f, 1.0f, 0.5f,   0.0f, 1.0f    // Верхний левый
+		0.5f,  0.5f, 0.1f,    1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,   // Верхний правый
+		0.5f, -0.5f, 0.1f,    1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,   // Нижний правыйglfw.rc
+		-0.5f, -0.5f, 0.1f,   1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,   // Нижний левыйglfw
+		-0.5f,  0.5f, 0.1f,   1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f    // Верхний левый
 	};
 	GLuint indices[] = {
 		2, 3, 0,
@@ -55,14 +55,15 @@ void Scene::LoadObjects()
 	Object* new_object = new Object("D:\\Textures\\kostya_1.jpg");
 	objects.insert(objects.end(), new_object);
 	
-	new_object = new Object("D:\\Textures\\kostya_2.jpg");
-	new_object->RotateY(1.5f);
-	objects.insert(objects.end(), new_object);
+	//new_object = new Object("D:\\Textures\\kostya_2.jpg");
+	//new_object->RotateY(1.5f);
+	//objects.insert(objects.end(), new_object);
 
-	new_object = new Object();
-	new_object->RotateX(1.5f);
-	objects.insert(objects.end(), new_object);
+	//new_object = new Object();
+	//new_object->RotateX(1.5f);
+	//objects.insert(objects.end(), new_object);
 
+	objects.insert(objects.end(), new TextField());
 	objects.insert(objects.end(), new Object("D:\\Textures\\table.png", vertices, 36, indices, 9));
 
 	selected_object = objects[selected_object_index];
@@ -204,5 +205,6 @@ void Scene::ProcessPressedKeys()
 
 void Scene::Cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	//включить если нужно вращение камеры
 	camera->Rotate(xpos, ypos);
 }

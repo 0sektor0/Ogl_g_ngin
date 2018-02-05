@@ -3,7 +3,7 @@
 
 
 
-Camera::Camera(const int& window_width, const int& window_height)
+Camera::Camera()
 {
 	Reset();
 	
@@ -11,7 +11,24 @@ Camera::Camera(const int& window_width, const int& window_height)
 	camera_y = &camera_pos[1];
 	camera_z = &camera_pos[2];
 
-	projection = glm::perspective(CAM_DEFAULT_FOV, (float)(window_width / window_height), CAM_DEFAULT_NEAR_PLANE, CAM_DEFAULT_FAR_PLANE);	
+	projection = glm::perspective(CAM_DEFAULT_FOV, 800.0f/600.0f, CAM_DEFAULT_NEAR_PLANE, CAM_DEFAULT_FAR_PLANE);
+}
+
+
+Camera::Camera(int projection_type)
+{
+	Reset();
+
+	camera_x = &camera_pos[0];
+	camera_y = &camera_pos[1];
+	camera_z = &camera_pos[2];
+
+	projection = glm::perspective(CAM_DEFAULT_FOV, 800.0f / 600.0f, CAM_DEFAULT_NEAR_PLANE, CAM_DEFAULT_FAR_PLANE);
+
+	if(projection_type == CAM_PROJECTION_PERSPECTIVE)
+		projection = glm::perspective(CAM_DEFAULT_FOV, 800.0f / 600.0f, CAM_DEFAULT_NEAR_PLANE, CAM_DEFAULT_FAR_PLANE);
+	if(projection_type == CAM_PROJECTION_ORTHO)
+		projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
 }
 
 
