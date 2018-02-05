@@ -6,8 +6,9 @@ class Object
 public:
 	Object(char* tex_file, GLfloat* vert, int verticies_count, GLuint* ind, int indices_count);
 	void Render(const mat4& view, const mat4& projection);
-	void MoveRight(float l);
 	void MoveForward(float l);
+	void MoveRight(float l);
+	Object(char* tex_file);
 	void RotateX(float l);
 	void RotateY(float l);
 	void RotateZ(float l);

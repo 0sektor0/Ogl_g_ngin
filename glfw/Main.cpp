@@ -34,7 +34,10 @@ int main()
 
 	//привязываем к окну обработчик нажатия клавиш
 	glfwSetKeyCallback(window, Key_callback);
-	//glfwSetCursorPosCallback(window, Cursor_position_callback);
+
+	//захват курсора
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, Cursor_position_callback);
 
 	//игровой цикл
 	while (!glfwWindowShouldClose(window))
@@ -44,9 +47,9 @@ int main()
 		//CalculateFrameRate();
 
 		glfwPollEvents();
+		scene->ProcessPressedKeys();
 	}
 
-	//завершение работы
 	return 0;
 }
 
@@ -63,7 +66,7 @@ bool Init_window(GLFWwindow** window, int w, int h, bool is_resizeble)
 	glfwWindowHint(GLFW_RESIZABLE, is_resizeble);
 
 	//создание окна
-	*window = glfwCreateWindow(w, h, "LearnOpenGL", NULL/*glfwGetPrimaryMonitor()*/, NULL);
+	*window = glfwCreateWindow(w, h, "Kongyne", NULL/*glfwGetPrimaryMonitor()*/, NULL);
 	if (window == nullptr)
 	{
 		glfwTerminate();
@@ -105,6 +108,8 @@ bool Init_GLEW(GLFWwindow* window)
 
 	return 1;
 }
+
+
 
 
 //отклик на нажатие клавиш

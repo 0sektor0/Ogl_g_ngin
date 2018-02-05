@@ -104,7 +104,6 @@ void Mesh::Render(const mat4& model, const mat4& view, const mat4& projection)
 	//включение нужных режимов в opengl
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
 
 	//передаем видовые матрицы в параметры шэйдера
 	glUniformMatrix4fv(shader->m_uniforms[SHADER_LOCAL_MATRIX], 1, GL_FALSE, glm::value_ptr(local));
@@ -120,7 +119,6 @@ void Mesh::Render(const mat4& model, const mat4& view, const mat4& projection)
 	//выключение режимов
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
 }
 
 

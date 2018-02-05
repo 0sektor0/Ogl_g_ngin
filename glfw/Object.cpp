@@ -29,6 +29,33 @@ Object::Object()
 }
 
 
+Object::Object(char* file)
+{
+	GLfloat vertices[] = {
+		// Позиции            // Цвета                  // Текстурные координаты
+		1.0f,  1.0f, 0.0f,    1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,   // Верхний правый
+		1.0f, -1.0f, 0.0f,    1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,   // Нижний правыйglfw.rc
+		-1.0f, -1.0f, 0.0f,   1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,   // Нижний левыйglfw
+		-1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f    // Верхний левый
+	};
+	GLuint indices[] = {
+		2, 3, 0,
+		0, 1, 2
+	};
+
+	Shader* shader = new Shader("shader");
+	Texture2d* texture = new Texture2d(file);
+
+	mesh = new Mesh(&vertices[0], 36, &indices[0], 6);
+	mesh->Bind_shader(shader);
+	mesh->Bind_texture(texture);
+
+	object_x = &model[3][0];
+	object_y = &model[3][1];
+	object_z = &model[3][2];
+}
+
+
 Object::Object(char* tex_file, GLfloat* vert, int verticies_count, GLuint* ind, int indices_count)
 {
 	Shader* shader = new Shader("shader");
@@ -73,6 +100,14 @@ void Object::MoveForward(float l)
 {
 	Move(glm::vec3(0.0f, 0.0f, l));
 }
+
+
+void Object::MoveRight(float l)
+{
+	Move(glm::vec3(l, 0.0f, 0.0f));
+}
+
+
 
 
 void Object::RotateY(float angle)
